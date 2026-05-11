@@ -43,9 +43,23 @@ MVP local de autenticação e autorização real com **Auth0**, mostrando **RBAC
 
 ---
 
-## Setup do Auth0
+## 📚 Setup completo — 2 documentos
 
-Configuração detalhada (com prints e atalhos): [`docs/AUTH0_SETUP.md`](docs/AUTH0_SETUP.md)
+| Documento | Quando usar |
+|---|---|
+| [`docs/AUTH0_SETUP.md`](docs/AUTH0_SETUP.md) | **Toda a configuração do tenant Auth0**: SPA admin-web + API admin-api + permissions + RBAC + roles + users + **app Native admin-mcp** (passo 10). Faça uma vez. |
+| [`docs/MCP_SETUP.md`](docs/MCP_SETUP.md) | **Cliente MCP + Claude Code**: build, PKCE login no browser, `claude mcp add` com caminhos absolutos, troubleshooting (versão do Node, paths quebrados, ssh keys, etc). |
+
+**Ordem recomendada:**
+1. `AUTH0_SETUP.md` (10 min) → cria tenant, apps, permissions, roles, users
+2. Subir o stack: `npm run setup && docker compose up --build`
+3. `MCP_SETUP.md` (5 min) → login no MCP + registrar no Claude Code
+
+---
+
+## Setup do Auth0 (resumo)
+
+Configuração detalhada com prints e atalhos: [`docs/AUTH0_SETUP.md`](docs/AUTH0_SETUP.md)
 
 Resumo:
 

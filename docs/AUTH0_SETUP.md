@@ -243,25 +243,101 @@ Volta em Applications → admin-web → Settings → Advanced → Grant Types �
 
 ---
 
-## Recap do que você configurou
+## 10. Criar a application Native (para o MCP server)
+
+Se você for usar o `apps/admin-mcp` (integrado com Claude Code), precisa criar **outra application** — Native, separada da SPA.
+
+### Criar
+
+**Applications → Applications → + Create Application**:
+- Name: `admin-mcp`
+- Type: **Native** ⚠️ (não é SPA)
+
+### Settings → Application URIs
+
+| Campo | Valor |
+|---|---|
+| **Allowed Callback URLs** | `http://localhost:8765/callback` |
+| **Allowed Logout URLs** | `http://localhost:8765` |
+| **Allowed Web Origins** | *(deixe vazio)* |
+| **Allowed Origins (CORS)** | *(deixe vazio)* |
+
+⚠️ Sem barra `/` no final, sem espaços. Save Changes no fim.
+
+### Settings → Advanced Settings → Grant Types
+
+Marcar:
+- ✅ **Authorization Code**
+- ✅ **Refresh Token**
+
+### Settings → Refresh Token Rotation
+
+- ✅ **Rotation: ON**
+- **Reuse Interval:** 0 (default)
+- **Absolute Lifetime:** 2592000 (30 dias)
+
+Save Changes.
+
+### Settings → Credentials (se aparecer)
+
+- **Token Endpoint Authentication Method:** `None`
+
+(Native apps já vêm com `None` por padrão. Se a aba Credentials não aparecer, está correto — pode pular.)
+
+### Autorizar a API admin-api
+
+**APIs → admin-api → aba Application Access**:
+
+1. A linha `admin-mcp` deve aparecer com `0/6 permissions granted` em User-delegated
+2. Clica em **Edit**
+3. Em **User-delegated access**, marcar **TODAS as 6 permissions**:
+   - ✅ read:customers
+   - ✅ write:customers
+   - ✅ delete:customers
+   - ✅ read:products
+   - ✅ write:products
+   - ✅ delete:products
+4. **Save**
+
+Linha do `admin-mcp` deve ficar com `6/6 permissions granted` ✅
+
+### Anotar Client ID
+
+Volta em **Applications → admin-mcp → Settings → Basic Information** → copia o **Client ID** (ex: `hknWj9Lq...`). Vai pro `apps/admin-mcp/.env`:
+
+```
+MCP_CLIENT_ID=<o-client-id-do-app-native>
+```
+
+> Não precisa do `Client Secret` — PKCE não usa.
+
+---
+
+## Recap completo (Auth0)
 
 ```
 Tenant
 ├── Applications
-│   └── admin-web (SPA, RS256)
-│       └── Allowed: http://localhost:5173[/]
+│   ├── admin-web (SPA, RS256, PKCE)
+│   │   └── Allowed: http://localhost:5173[/]
+│   └── admin-mcp (Native, PKCE, Refresh Token Rotation)
+│       └── Allowed: http://localhost:8765/callback
 ├── APIs
 │   └── admin-api (audience: https://admin-api.local)
 │       ├── 6 permissions: read|write|delete : customers|products
 │       ├── RBAC ON + Add Permissions in Token ON
-│       └── Application Access: admin-web autorizada (6/6 user-delegated)
+│       └── Application Access:
+│           ├── admin-web → 6/6 user-delegated
+│           └── admin-mcp → 6/6 user-delegated
 ├── User Management
 │   ├── Roles
 │   │   ├── admin   → 6 permissions
-│   │   └── user    → 2 permissions
+│   │   └── user    → 2 permissions (só read:*)
 │   └── Users
 │       ├── admin@demo.local → role admin
 │       └── user@demo.local  → role user
 ```
 
-Resultado: tokens JWT corretos, RBAC funcionando, scopes filtrados pelo Auth0 baseado em quem fez login.
+Próximos passos:
+- **Pra rodar a app web e API:** copie os Client ID + Domain pros respectivos `.env` (veja `apps/admin-api/.env.example` e `apps/admin-web/.env.example`) e rode `docker compose up`.
+- **Pra configurar o MCP + Claude Code:** veja [`MCP_SETUP.md`](MCP_SETUP.md).
