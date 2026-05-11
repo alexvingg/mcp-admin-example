@@ -1,0 +1,29 @@
+{
+  "name": "auth0-project-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Auth0 RBAC demo: admin-web (React+Vite) + admin-api (Express+Prisma+Postgres) — MVP local com Docker",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "docker compose up --build",
+    "down": "docker compose down",
+    "down:v": "docker compose down -v",
+    "logs": "docker compose logs -f",
+    "logs:api": "docker compose logs -f admin-api",
+    "logs:web": "docker compose logs -f admin-web",
+    "logs:db": "docker compose logs -f db",
+    "ps": "docker compose ps",
+    "restart:api": "docker compose restart admin-api",
+    "restart:web": "docker compose restart admin-web",
+    "shell:api": "docker compose exec admin-api sh",
+    "shell:db": "docker compose exec db psql -U admin -d admindb",
+    "setup": "bash scripts/setup.sh",
+    "mcp:build":  "npm --workspace=apps/admin-mcp run build",
+    "mcp:login":  "npm run mcp:build && node apps/admin-mcp/dist/cli.js login",
+    "mcp:logout": "node apps/admin-mcp/dist/cli.js logout",
+    "mcp:status": "node apps/admin-mcp/dist/cli.js status",
+    "mcp:server": "node apps/admin-mcp/dist/server.js"
+  }
+}

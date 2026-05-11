@@ -1,0 +1,41 @@
+// Prisma schema — Postgres
+// Após editar este arquivo, rode `npx prisma migrate dev --name <change>` em desenvolvimento.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CustomerStatus {
+  active
+  inactive
+}
+
+enum ProductStatus {
+  active
+  inactive
+}
+
+model Customer {
+  id        String         @id @default(cuid())
+  name      String
+  email     String         @unique
+  status    CustomerStatus @default(active)
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  @@map("customers")
+}
+
+model Product {
+  id        String        @id @default(cuid())
+  name      String
+  price     Decimal       @db.Decimal(10, 2)
+  status    ProductStatus @default(active)
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  @@map("products")
+}
